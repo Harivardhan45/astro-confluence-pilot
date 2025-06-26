@@ -9,6 +9,7 @@ import { VideoSummarizer } from "@/components/features/VideoSummarizer";
 import { CodeAssistant } from "@/components/features/CodeAssistant";
 import { ImpactAnalyzer } from "@/components/features/ImpactAnalyzer";
 import { TestingSupport } from "@/components/features/TestingSupport";
+import { FloatingWidgetLauncher } from "@/components/features/FloatingWidgetLauncher";
 
 const Index = () => {
   const [activeView, setActiveView] = useState("dashboard");
@@ -42,6 +43,7 @@ const Index = () => {
             {renderContent()}
           </main>
         </div>
+        <FloatingWidgetLauncher />
       </div>
     </ThemeProvider>
   );
