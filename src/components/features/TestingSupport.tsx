@@ -2,260 +2,272 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TestTube, Target, AlertTriangle, CheckCircle, Play, Download, FileText } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TestTube, Download, Save, FileText, MessageSquare, Target, AlertTriangle, CheckCircle } from "lucide-react";
 
 export function TestingSupport() {
-  const [selectedFeature, setSelectedFeature] = useState("user-auth");
+  const [selectedCodePage, setSelectedCodePage] = useState("");
+  const [selectedTestInputPage, setSelectedTestInputPage] = useState("");
+  const [question, setQuestion] = useState("");
+  const [testStrategy, setTestStrategy] = useState<any>(null);
 
-  const testFeatures = [
+  const codePages = [
+    {
+      id: "payment-service",
+      title: "Payment Processing Service",
+      description: "Handles payment transactions and billing",
+      complexity: "high",
+      lastUpdated: "1 day ago"
+    },
     {
       id: "user-auth",
-      name: "User Authentication",
-      description: "Login, registration, and password reset flows",
+      title: "User Authentication Module",
+      description: "Login, registration, and session management",
       complexity: "medium",
-      coverage: 78,
-      lastUpdated: "2 days ago"
-    },
-    {
-      id: "payment-flow",
-      name: "Payment Processing",
-      description: "Checkout, billing, and subscription management", 
-      complexity: "high",
-      coverage: 45,
-      lastUpdated: "1 week ago"
-    },
-    {
-      id: "data-export",
-      name: "Data Export",
-      description: "CSV, PDF, and API data export functionality",
-      complexity: "low",
-      coverage: 92,
       lastUpdated: "3 days ago"
+    },
+    {
+      id: "data-validator",
+      title: "Data Validation Utils",
+      description: "Input validation and sanitization functions",
+      complexity: "low",
+      lastUpdated: "1 week ago"
     }
   ];
 
-  const testStrategies = {
-    "user-auth": {
+  const testInputPages = [
+    {
+      id: "payment-requirements",
+      title: "Payment System Requirements",
+      description: "Business rules and edge cases for payments",
+      lastUpdated: "2 days ago"
+    },
+    {
+      id: "auth-scenarios",
+      title: "Authentication Test Scenarios",
+      description: "User stories and security requirements",
+      lastUpdated: "1 week ago"
+    },
+    {
+      id: "validation-rules",
+      title: "Data Validation Requirements",
+      description: "Input formats and validation criteria",
+      lastUpdated: "5 days ago"
+    }
+  ];
+
+  const handleGenerateStrategy = () => {
+    if (!selectedCodePage || !selectedTestInputPage) return;
+    
+    setTestStrategy({
       overview: {
-        totalTests: 24,
-        passRate: 87.5,
-        criticalPaths: 5,
-        riskAreas: [
-          "Password validation edge cases",
-          "Concurrent login attempts", 
-          "Session timeout handling",
-          "OAuth integration flows"
-        ]
+        totalTestCases: 34,
+        coverage: 87,
+        criticalPaths: 6,
+        riskScore: 42
       },
-      testCases: [
+      testCategories: [
         {
           category: "Unit Tests",
+          count: 18,
           priority: "high",
-          count: 12,
           tests: [
-            "Password hashing validation",
-            "Token generation and verification",
-            "Email format validation",
-            "User input sanitization"
+            "Payment amount validation",
+            "Currency conversion accuracy",
+            "Transaction fee calculations",
+            "Error handling for invalid inputs"
           ]
         },
         {
-          category: "Integration Tests", 
+          category: "Integration Tests",
+          count: 12,
           priority: "high",
-          count: 8,
           tests: [
-            "Login flow end-to-end",
-            "Registration with email verification",
-            "Password reset workflow",
-            "OAuth provider integration"
+            "Payment gateway integration",
+            "Database transaction rollback",
+            "Email notification triggers",
+            "Webhook delivery confirmation"
           ]
         },
         {
           category: "Security Tests",
-          priority: "critical",
           count: 4,
+          priority: "critical",
           tests: [
+            "Credit card data encryption",
+            "PCI compliance validation",
             "SQL injection prevention",
-            "Cross-site scripting (XSS) protection", 
-            "Brute force attack mitigation",
-            "Session hijacking prevention"
+            "Authentication bypass attempts"
           ]
         }
       ],
       sensitivityAnalysis: [
         {
-          component: "Password Validation",
+          component: "Payment Amount Processing",
           sensitivity: "high",
-          impact: "Critical user experience impact if validation is too strict or lenient",
-          recommendation: "Test with 50+ real password combinations including edge cases"
+          impact: "Critical financial impact if amounts are processed incorrectly",
+          testStrategy: "Test with boundary values, floating point precision, and currency conversion edge cases",
+          riskLevel: "critical"
         },
         {
-          component: "Session Management",
-          sensitivity: "medium", 
-          impact: "Users may be logged out unexpectedly if timeout is too aggressive",
-          recommendation: "Test across different user behavior patterns and connection types"
+          component: "Authentication Flow",
+          sensitivity: "medium",
+          impact: "User experience degradation if authentication fails",
+          testStrategy: "Test concurrent logins, session timeouts, and password reset flows",
+          riskLevel: "medium"
         },
         {
-          component: "Email Verification",
+          component: "Error Handling",
           sensitivity: "low",
-          impact: "Delayed verification doesn't block core functionality",
-          recommendation: "Test email delivery across major providers and spam filters"
+          impact: "User confusion but no data loss",
+          testStrategy: "Test various error scenarios and message clarity",
+          riskLevel: "low"
         }
+      ],
+      recommendations: [
+        "Implement automated regression testing for payment calculations",
+        "Add load testing for concurrent payment processing",
+        "Set up security scanning for PCI compliance",
+        "Create end-to-end test scenarios covering full user journeys"
       ]
-    }
+    });
   };
-
-  const currentStrategy = testStrategies[selectedFeature];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Testing Support Tool</h1>
         <p className="text-muted-foreground">
-          Generate comprehensive test strategies and analyze system sensitivity for your features.
+          Generate comprehensive test strategies and sensitivity analysis for your code components.
         </p>
       </div>
 
-      {/* Feature Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Select Feature to Test</CardTitle>
-          <CardDescription>
-            Choose a feature to generate test strategies and sensitivity analysis
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {testFeatures.map((feature) => (
-              <div
-                key={feature.id}
-                onClick={() => setSelectedFeature(feature.id)}
-                className={`p-4 rounded-lg border cursor-pointer transition-colors hover:bg-accent ${
-                  selectedFeature === feature.id ? 'bg-accent border-primary' : ''
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <TestTube className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-sm">{feature.name}</span>
-                </div>
-                <p className="text-xs text-muted-foreground mb-3">
-                  {feature.description}
-                </p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Input Selection */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Test Configuration</CardTitle>
+            <CardDescription>Select code and test input pages</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="code-page">Code Page to Test</Label>
+              <Select value={selectedCodePage} onValueChange={setSelectedCodePage}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select code page" />
+                </SelectTrigger>
+                <SelectContent>
+                  {codePages.map((page) => (
+                    <SelectItem key={page.id} value={page.id}>
+                      {page.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedCodePage && (
+                <div className="mt-2 p-2 bg-muted rounded text-xs">
+                  <div>{codePages.find(p => p.id === selectedCodePage)?.description}</div>
+                  <div className="flex items-center gap-2 mt-1">
                     <Badge 
                       variant={
-                        feature.complexity === 'high' ? 'destructive' :
-                        feature.complexity === 'medium' ? 'default' : 'secondary'
+                        codePages.find(p => p.id === selectedCodePage)?.complexity === 'high' ? 'destructive' :
+                        codePages.find(p => p.id === selectedCodePage)?.complexity === 'medium' ? 'default' : 'secondary'
                       }
                       className="text-xs"
                     >
-                      {feature.complexity}
+                      {codePages.find(p => p.id === selectedCodePage)?.complexity} complexity
                     </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {feature.coverage}% coverage
-                    </span>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Updated {feature.lastUpdated}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="test-input-page">Test Input Page</Label>
+              <Select value={selectedTestInputPage} onValueChange={setSelectedTestInputPage}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select test inputs" />
+                </SelectTrigger>
+                <SelectContent>
+                  {testInputPages.map((page) => (
+                    <SelectItem key={page.id} value={page.id}>
+                      {page.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedTestInputPage && (
+                <div className="mt-2 p-2 bg-muted rounded text-xs">
+                  {testInputPages.find(p => p.id === selectedTestInputPage)?.description}
+                </div>
+              )}
+            </div>
+
+            <Button 
+              onClick={handleGenerateStrategy} 
+              disabled={!selectedCodePage || !selectedTestInputPage}
+              className="w-full"
+            >
+              <TestTube className="mr-2 h-4 w-4" />
+              Generate Test Strategy
+            </Button>
+
+            {testStrategy && (
+              <div className="space-y-2 pt-4 border-t">
+                <h4 className="font-medium text-sm">Strategy Overview</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span>Test Cases:</span>
+                    <Badge variant="secondary" className="text-xs">{testStrategy.overview.totalTestCases}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Coverage:</span>
+                    <Badge variant="outline" className="text-xs">{testStrategy.overview.coverage}%</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Critical Paths:</span>
+                    <Badge variant="default" className="text-xs">{testStrategy.overview.criticalPaths}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Risk Score:</span>
+                    <Badge variant="destructive" className="text-xs">{testStrategy.overview.riskScore}</Badge>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Test Strategy Generation */}
-      {currentStrategy && (
-        <div className="space-y-6">
-          {/* Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <TestTube className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Total Tests</span>
-                </div>
-                <div className="text-2xl font-bold mt-1">
-                  {currentStrategy.overview.totalTests}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm font-medium">Pass Rate</span>
-                </div>
-                <div className="text-2xl font-bold mt-1">
-                  {currentStrategy.overview.passRate}%
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Target className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Critical Paths</span>
-                </div>
-                <div className="text-2xl font-bold mt-1">
-                  {currentStrategy.overview.criticalPaths}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm font-medium">Risk Areas</span>
-                </div>
-                <div className="text-2xl font-bold mt-1">
-                  {currentStrategy.overview.riskAreas.length}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Detailed Strategy */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Test Strategy & Sensitivity Analysis</CardTitle>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Strategy
-                  </Button>
-                  <Button size="sm">
-                    <Play className="h-4 w-4 mr-2" />
-                    Run Tests
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
+        {/* Test Strategy Results */}
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Generated Test Strategy & Analysis</CardTitle>
+            <CardDescription>
+              Comprehensive testing approach with sensitivity analysis and recommendations
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {testStrategy ? (
               <Tabs defaultValue="strategy" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="strategy">Test Strategy</TabsTrigger>
                   <TabsTrigger value="sensitivity">Sensitivity Analysis</TabsTrigger>
-                  <TabsTrigger value="generator">Generate New</TabsTrigger>
+                  <TabsTrigger value="report">Combined Report</TabsTrigger>
+                  <TabsTrigger value="qa">Q&A</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="strategy" className="space-y-6">
-                  {currentStrategy.testCases.map((category, index) => (
+                <TabsContent value="strategy" className="space-y-4">
+                  {testStrategy.testCategories.map((category: any, index: number) => (
                     <Card key={index}>
-                      <CardHeader>
+                      <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{category.category}</CardTitle>
-                          <div className="flex items-center gap-2">
+                          <CardTitle className="text-base">{category.category}</CardTitle>
+                          <div className="flex gap-2">
                             <Badge 
                               variant={
                                 category.priority === 'critical' ? 'destructive' :
@@ -263,20 +275,20 @@ export function TestingSupport() {
                               }
                               className="text-xs"
                             >
-                              {category.priority} priority
+                              {category.priority}
                             </Badge>
-                            <span className="text-sm text-muted-foreground">
+                            <Badge variant="outline" className="text-xs">
                               {category.count} tests
-                            </span>
+                            </Badge>
                           </div>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {category.tests.map((test, testIndex) => (
-                            <div key={testIndex} className="flex items-center gap-2 p-2 border rounded">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {category.tests.map((test: string, testIndex: number) => (
+                            <div key={testIndex} className="flex items-center gap-2 p-2 border rounded text-sm">
                               <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                              <span className="text-sm">{test}</span>
+                              {test}
                             </div>
                           ))}
                         </div>
@@ -286,20 +298,31 @@ export function TestingSupport() {
                 </TabsContent>
                 
                 <TabsContent value="sensitivity" className="space-y-4">
-                  {currentStrategy.sensitivityAnalysis.map((analysis, index) => (
+                  {testStrategy.sensitivityAnalysis.map((analysis: any, index: number) => (
                     <Card key={index}>
-                      <CardHeader>
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">{analysis.component}</CardTitle>
-                          <Badge 
-                            variant={
-                              analysis.sensitivity === 'high' ? 'destructive' :
-                              analysis.sensitivity === 'medium' ? 'default' : 'secondary'
-                            }
-                            className="text-xs"
-                          >
-                            {analysis.sensitivity} sensitivity
-                          </Badge>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base">{analysis.component}</CardTitle>
+                          <div className="flex gap-2">
+                            <Badge 
+                              variant={
+                                analysis.sensitivity === 'high' ? 'destructive' :
+                                analysis.sensitivity === 'medium' ? 'default' : 'secondary'
+                              }
+                              className="text-xs"
+                            >
+                              {analysis.sensitivity} sensitivity
+                            </Badge>
+                            <Badge 
+                              variant={
+                                analysis.riskLevel === 'critical' ? 'destructive' :
+                                analysis.riskLevel === 'medium' ? 'default' : 'secondary'
+                              }
+                              className="text-xs"
+                            >
+                              {analysis.riskLevel} risk
+                            </Badge>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
@@ -308,49 +331,109 @@ export function TestingSupport() {
                           <p className="text-sm text-muted-foreground">{analysis.impact}</p>
                         </div>
                         <div>
-                          <h4 className="font-medium text-sm mb-1">Recommendation</h4>
-                          <p className="text-sm text-muted-foreground">{analysis.recommendation}</p>
+                          <h4 className="font-medium text-sm mb-1">Testing Strategy</h4>
+                          <p className="text-sm text-muted-foreground">{analysis.testStrategy}</p>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                 </TabsContent>
                 
-                <TabsContent value="generator" className="space-y-4">
+                <TabsContent value="report" className="space-y-4">
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <h4 className="font-medium mb-3">Executive Summary</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-primary">{testStrategy.overview.totalTestCases}</div>
+                        <div className="text-xs text-muted-foreground">Total Tests</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">{testStrategy.overview.coverage}%</div>
+                        <div className="text-xs text-muted-foreground">Coverage</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">{testStrategy.overview.criticalPaths}</div>
+                        <div className="text-xs text-muted-foreground">Critical Paths</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-red-600">{testStrategy.overview.riskScore}</div>
+                        <div className="text-xs text-muted-foreground">Risk Score</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Key Recommendations</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {testStrategy.recommendations.map((rec: string, index: number) => (
+                          <div key={index} className="flex items-start gap-2">
+                            <Target className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{rec}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="qa" className="space-y-4">
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="feature-name">Feature Name</Label>
-                        <Input id="feature-name" placeholder="e.g., Shopping Cart" />
-                      </div>
-                      <div>
-                        <Label htmlFor="complexity">Complexity Level</Label>
-                        <Input id="complexity" placeholder="Low, Medium, High" />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="description">Feature Description</Label>
-                      <Input id="description" placeholder="Describe the feature functionality..." />
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      <Button>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Generate Test Strategy
-                      </Button>
-                      <Button variant="outline">
-                        <AlertTriangle className="h-4 w-4 mr-2" />
-                        Analyze Sensitivity
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Ask about the test strategy or sensitivity analysis..."
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button size="sm">
+                        <MessageSquare className="h-4 w-4" />
                       </Button>
                     </div>
+                    
+                    {question && (
+                      <div className="bg-muted/50 rounded-lg p-4">
+                        <h4 className="font-medium mb-2">Your Question:</h4>
+                        <p className="text-sm mb-3">{question}</p>
+                        <h4 className="font-medium mb-2">AI Answer:</h4>
+                        <p className="text-sm">Based on the generated test strategy, the payment processing component requires the highest attention due to its critical financial impact. The recommended approach includes boundary value testing, concurrent transaction handling, and comprehensive error scenario coverage to ensure system reliability.</p>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
               </Tabs>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <TestTube className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Select code and test input pages to generate a comprehensive test strategy</p>
+              </div>
+            )}
+            
+            {testStrategy && (
+              <div className="flex justify-between items-center pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">Strategy Generated</Badge>
+                  <span className="text-xs text-muted-foreground">
+                    Ready for implementation
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export Report
+                  </Button>
+                  <Button size="sm">
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Strategy
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
