@@ -1,48 +1,36 @@
 
-import { useState } from "react";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { Header } from "@/components/Header";
-import { Sidebar } from "@/components/Sidebar";
-import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
-import { AISearch } from "@/components/features/AISearch";
-import { VideoSummarizer } from "@/components/features/VideoSummarizer";
-import { CodeAssistant } from "@/components/features/CodeAssistant";
-import { ImpactAnalyzer } from "@/components/features/ImpactAnalyzer";
-import { TestingSupport } from "@/components/features/TestingSupport";
 import { FloatingWidgetLauncher } from "@/components/features/FloatingWidgetLauncher";
 
 const Index = () => {
-  const [activeView, setActiveView] = useState("dashboard");
-
-  const renderContent = () => {
-    switch (activeView) {
-      case "dashboard":
-        return <DashboardOverview />;
-      case "search":
-        return <AISearch />;
-      case "video":
-        return <VideoSummarizer />;
-      case "code":
-        return <CodeAssistant />;
-      case "diff":
-        return <ImpactAnalyzer />;
-      case "testing":
-        return <TestingSupport />;
-      default:
-        return <DashboardOverview />;
-    }
-  };
-
   return (
     <ThemeProvider defaultTheme="light" storageKey="confluence-ai-theme">
-      <div className="min-h-screen flex w-full bg-background">
-        <Sidebar activeView={activeView} onViewChange={setActiveView} />
-        <div className="flex-1 flex flex-col">
-          <Header />
-          <main className="flex-1 p-6 overflow-auto">
-            {renderContent()}
-          </main>
+      <div className="min-h-screen w-full bg-background/50 backdrop-blur-sm">
+        {/* Simulated Confluence page content */}
+        <div className="max-w-4xl mx-auto p-8 space-y-6">
+          <div className="bg-card rounded-lg p-6 shadow-sm border">
+            <h1 className="text-2xl font-semibold mb-4">Project Documentation</h1>
+            <p className="text-muted-foreground mb-4">
+              This is a sample Confluence page where the AI assistant tools can be accessed 
+              through the floating panel on the right side of the screen.
+            </p>
+            <div className="space-y-4">
+              <div className="h-4 bg-muted rounded w-3/4"></div>
+              <div className="h-4 bg-muted rounded w-1/2"></div>
+              <div className="h-4 bg-muted rounded w-5/6"></div>
+            </div>
+          </div>
+          
+          <div className="bg-card rounded-lg p-6 shadow-sm border">
+            <h2 className="text-xl font-semibold mb-3">Getting Started</h2>
+            <div className="space-y-3">
+              <div className="h-3 bg-muted rounded w-4/5"></div>
+              <div className="h-3 bg-muted rounded w-2/3"></div>
+              <div className="h-3 bg-muted rounded w-3/4"></div>
+            </div>
+          </div>
         </div>
+        
         <FloatingWidgetLauncher />
       </div>
     </ThemeProvider>

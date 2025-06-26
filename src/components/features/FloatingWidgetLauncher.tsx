@@ -2,37 +2,84 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { Bot, Zap } from "lucide-react";
+import { Search, Video, Code, Activity, TestTube } from "lucide-react";
 import { FloatingWidget } from "./FloatingWidget";
 
+type FeatureType = 'search' | 'video' | 'code' | 'impact' | 'testing' | null;
+
 export function FloatingWidgetLauncher() {
-  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
+  const [activeFeature, setActiveFeature] = useState<FeatureType>(null);
+
+  const features = [
+    {
+      id: 'search' as FeatureType,
+      icon: Search,
+      label: 'AI Powered Search',
+      description: 'Search across Confluence with AI',
+      color: 'hover:bg-blue-500/10 hover:border-blue-300'
+    },
+    {
+      id: 'video' as FeatureType,
+      icon: Video,
+      label: 'Video Summarizer',
+      description: 'Summarize video content',
+      color: 'hover:bg-purple-500/10 hover:border-purple-300'
+    },
+    {
+      id: 'code' as FeatureType,
+      icon: Code,
+      label: 'Code Assistant',
+      description: 'AI-powered code help',
+      color: 'hover:bg-green-500/10 hover:border-green-300'
+    },
+    {
+      id: 'impact' as FeatureType,
+      icon: Activity,
+      label: 'Impact Analyzer',
+      description: 'Analyze change impact',
+      color: 'hover:bg-orange-500/10 hover:border-orange-300'
+    },
+    {
+      id: 'testing' as FeatureType,
+      icon: TestTube,
+      label: 'Test Support Tool',
+      description: 'Testing assistance tools',
+      color: 'hover:bg-red-500/10 hover:border-red-300'
+    }
+  ];
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-6 right-6 z-40">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={() => setIsWidgetVisible(true)}
-              className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 bg-primary hover:bg-primary/90"
-              disabled={isWidgetVisible}
-            >
-              <div className="relative">
-                <Bot className="h-6 w-6" />
-                <Zap className="h-3 w-3 absolute -top-1 -right-1 text-yellow-400" />
-              </div>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="left">
-            <p>Open Confluence AI Tools</p>
-          </TooltipContent>
-        </Tooltip>
+      <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40">
+        <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg p-2 space-y-1 min-w-[60px]">
+          {features.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <Tooltip key={feature.id}>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() => setActiveFeature(feature.id)}
+                    variant="ghost"
+                    size="icon"
+                    className={`h-12 w-12 rounded-lg transition-all duration-200 border border-transparent ${feature.color}`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left" className="font-medium">
+                  <p>{feature.label}</p>
+                  <p className="text-xs text-muted-foreground">{feature.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
       </div>
 
       <FloatingWidget 
-        isVisible={isWidgetVisible} 
-        onClose={() => setIsWidgetVisible(false)} 
+        isVisible={activeFeature !== null} 
+        activeFeature={activeFeature}
+        onClose={() => setActiveFeature(null)} 
       />
     </TooltipProvider>
   );
