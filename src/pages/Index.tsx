@@ -1,11 +1,11 @@
 
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ConfluenceAICard } from "@/components/features/ConfluenceAICard";
+import { Dashboard } from "@/components/Dashboard";
 
 const Index = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="confluence-ai-theme">
-      <ConfluenceAICard />
+      <Dashboard />
     </ThemeProvider>
   );
 };
