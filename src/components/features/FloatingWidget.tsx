@@ -7,9 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { 
   Search, 
-  Video, 
+  Film, 
   Code, 
-  Activity, 
+  ChartBar, 
   TestTube, 
   Minimize2, 
   Maximize2, 
@@ -25,12 +25,13 @@ import { TestingSupport } from "./TestingSupport";
 interface FloatingWidgetProps {
   isVisible: boolean;
   onClose: () => void;
+  isMinimized: boolean;
+  onMinimize: () => void;
 }
 
 type FeatureType = 'search' | 'video' | 'code' | 'impact' | 'testing' | null;
 
-export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
-  const [isMinimized, setIsMinimized] = useState(false);
+export function FloatingWidget({ isVisible, onClose, isMinimized, onMinimize }: FloatingWidgetProps) {
   const [activeFeature, setActiveFeature] = useState<FeatureType>(null);
   const [position, setPosition] = useState({ x: 20, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
@@ -43,35 +44,45 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
       icon: Search,
       label: 'AI Search',
       description: 'Search across Confluence with AI',
-      color: 'bg-blue-500/10 hover:bg-blue-500/20 border-blue-200 dark:border-blue-800'
+      bgColor: 'bg-blue-500',
+      hoverColor: 'hover:bg-blue-600',
+      textColor: 'text-white'
     },
     {
       id: 'video' as FeatureType,
-      icon: Video,
+      icon: Film,
       label: 'Video Summary',
       description: 'Summarize video content',
-      color: 'bg-purple-500/10 hover:bg-purple-500/20 border-purple-200 dark:border-purple-800'
+      bgColor: 'bg-purple-500',
+      hoverColor: 'hover:bg-purple-600',
+      textColor: 'text-white'
     },
     {
       id: 'code' as FeatureType,
       icon: Code,
-      label: 'Code Assistant',
-      description: 'AI-powered code help',
-      color: 'bg-green-500/10 hover:bg-green-500/20 border-green-200 dark:border-green-800'
+      label: 'Code Helper',
+      description: 'AI-powered code assistance',
+      bgColor: 'bg-green-500',
+      hoverColor: 'hover:bg-green-600',
+      textColor: 'text-white'
     },
     {
       id: 'impact' as FeatureType,
-      icon: Activity,
-      label: 'Impact Analyzer',
+      icon: ChartBar,
+      label: 'Impact Check',
       description: 'Analyze change impact',
-      color: 'bg-orange-500/10 hover:bg-orange-500/20 border-orange-200 dark:border-orange-800'
+      bgColor: 'bg-orange-500',
+      hoverColor: 'hover:bg-orange-600',
+      textColor: 'text-white'
     },
     {
       id: 'testing' as FeatureType,
       icon: TestTube,
       label: 'Test Support',
       description: 'Testing assistance tools',
-      color: 'bg-red-500/10 hover:bg-red-500/20 border-red-200 dark:border-red-800'
+      bgColor: 'bg-red-500',
+      hoverColor: 'hover:bg-red-600',
+      textColor: 'text-white'
     }
   ];
 
@@ -90,7 +101,7 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
         const newX = Math.max(0, Math.min(window.innerWidth - 280, e.clientX - dragOffset.x));
-        const newY = Math.max(0, Math.min(window.innerHeight - 400, e.clientY - dragOffset.y));
+        const newY = Math.max(0, Math.min(window.innerHeight - (isMinimized ? 80 : 450), e.clientY - dragOffset.y));
         setPosition({ x: newX, y: newY });
       }
     };
@@ -108,7 +119,7 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset]);
+  }, [isDragging, dragOffset, isMinimized]);
 
   const renderFeatureContent = () => {
     switch (activeFeature) {
@@ -136,10 +147,10 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
 
   return (
     <TooltipProvider>
-      <div className="fixed inset-0 pointer-events-none z-50">
+      <div className="fixed inset-0 pointer-events-none z-40">
         <Card
           ref={widgetRef}
-          className="absolute pointer-events-auto w-72 bg-background/95 backdrop-blur-sm border shadow-lg rounded-lg transition-all duration-300 ease-in-out hover:shadow-xl"
+          className="absolute pointer-events-auto w-64 bg-white/95 backdrop-blur-sm border border-gray-200 shadow-xl rounded-lg transition-all duration-300 ease-in-out hover:shadow-2xl"
           style={{
             left: position.x,
             top: position.y,
@@ -148,21 +159,21 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
         >
           {/* Header */}
           <div 
-            className="drag-handle flex items-center justify-between p-3 border-b cursor-move bg-muted/50 rounded-t-lg"
+            className="drag-handle flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200 cursor-move rounded-t-lg"
             onMouseDown={handleMouseDown}
           >
             <div className="flex items-center gap-2">
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
-              <Badge variant="outline" className="text-xs">
-                Confluence AI
+              <GripVertical className="h-4 w-4 text-gray-400" />
+              <Badge variant="outline" className="text-xs font-medium bg-white/80">
+                Confluence AI Assistant
               </Badge>
             </div>
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsMinimized(!isMinimized)}
-                className="h-6 w-6 p-0"
+                onClick={onMinimize}
+                className="h-6 w-6 p-0 hover:bg-white/60"
               >
                 {isMinimized ? <Maximize2 className="h-3 w-3" /> : <Minimize2 className="h-3 w-3" />}
               </Button>
@@ -170,7 +181,7 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 hover:bg-white/60"
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -179,7 +190,7 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
 
           {/* Content */}
           {!isMinimized && (
-            <div className="p-3 space-y-2 flex-1 overflow-y-auto">
+            <div className="p-3 space-y-3 flex-1 overflow-y-auto">
               {features.map((feature) => {
                 const Icon = feature.icon;
                 return (
@@ -187,16 +198,16 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
-                        className={`w-full justify-start h-16 p-3 transition-all duration-200 hover:scale-105 border ${feature.color}`}
+                        className={`w-full justify-start h-14 p-3 transition-all duration-200 hover:scale-105 border-0 ${feature.bgColor} ${feature.hoverColor} ${feature.textColor} rounded-lg shadow-sm hover:shadow-md`}
                         onClick={() => setActiveFeature(feature.id)}
                       >
                         <div className="flex items-center gap-3 w-full">
-                          <div className="p-2 rounded-md bg-background/50">
+                          <div className="p-2 rounded-md bg-white/20">
                             <Icon className="h-4 w-4" />
                           </div>
                           <div className="flex-1 text-left">
                             <div className="font-medium text-sm">{feature.label}</div>
-                            <div className="text-xs text-muted-foreground truncate">
+                            <div className="text-xs opacity-90 truncate">
                               {feature.description}
                             </div>
                           </div>
@@ -215,9 +226,9 @@ export function FloatingWidget({ isVisible, onClose }: FloatingWidgetProps) {
 
         {/* Feature Modal */}
         <Dialog open={activeFeature !== null} onOpenChange={() => setActiveFeature(null)}>
-          <DialogContent className="max-w-6xl h-[80vh] overflow-hidden p-0">
-            <DialogHeader className="p-6 pb-4">
-              <DialogTitle className="text-xl">{getFeatureTitle()}</DialogTitle>
+          <DialogContent className="max-w-4xl h-[80vh] overflow-hidden p-0 bg-white">
+            <DialogHeader className="p-6 pb-4 border-b bg-gradient-to-r from-blue-50 to-purple-50">
+              <DialogTitle className="text-xl font-semibold text-gray-800">{getFeatureTitle()}</DialogTitle>
             </DialogHeader>
             <div className="flex-1 overflow-auto px-6 pb-6">
               {renderFeatureContent()}
