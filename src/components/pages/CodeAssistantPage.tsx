@@ -1,201 +1,477 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Code, Download, Save, Loader2, Lightbulb, Bug, FileCode } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Code, Download, Save, Copy, RefreshCw } from "lucide-react";
 
 export function CodeAssistantPage() {
-  const [code, setCode] = useState("");
-  const [language, setLanguage] = useState("javascript");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysis, setAnalysis] = useState<any>(null);
+  const [selectedPage, setSelectedPage] = useState("");
+  const [modificationPrompt, setModificationPrompt] = useState("");
+  const [originalCode, setOriginalCode] = useState("");
+  const [modifiedCode, setModifiedCode] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleAnalyze = async () => {
-    if (!code.trim()) return;
+  const codePages = [
+    "API Endpoints Documentation",
+    "Frontend Components",
+    "Backend Services",
+    "Database Schemas",
+    "Configuration Files",
+    "Build Scripts"
+  ];
+
+  const languages = [
+    "JavaScript",
+    "TypeScript", 
+    "Python",
+    "Java",
+    "C#",
+    "Go",
+    "Rust",
+    "PHP",
+    "Ruby"
+  ];
+
+  const handleLoadCode = () => {
+    if (!selectedPage) return;
     
-    setIsAnalyzing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setAnalysis({
-        suggestions: [
-          {
-            type: "optimization",
-            line: 5,
-            message: "Consider using const instead of let for variables that don't change",
-            code: "const result = calculateValue();"
-          },
-          {
-            type: "best-practice",
-            line: 12,
-            message: "Add error handling for async operations",
-            code: "try { await apiCall(); } catch (error) { handleError(error); }"
-          },
-          {
-            type: "security",
-            line: 18,
-            message: "Validate input parameters to prevent injection attacks",
-            code: "if (!isValidInput(userInput)) { throw new Error('Invalid input'); }"
-          }
-        ],
-        documentation: "This code implements a data processing function with API integration. Consider adding proper error handling, input validation, and using more descriptive variable names for better maintainability.",
-        complexity: "Medium",
-        maintainability: "Good"
-      });
-      setIsAnalyzing(false);
-    }, 2500);
+    // Simulate loading code from selected page
+    setOriginalCode(`// Original code from: ${selectedPage}
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const UserComponent: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/api/users');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="space-y-6 max-w-6xl">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Code className="h-8 w-8 text-primary" />
-          Code Assistant
-        </h1>
-        <p className="text-muted-foreground text-lg mt-2">
-          Get AI-powered code analysis, suggestions, and documentation
-        </p>
+    <div>
+      <h2>Users</h2>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <ul>
+          {users.map(user => (
+            <li key={user.id}>
+              {user.name} - {user.email}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default UserComponent;`);
+  };
+
+  const handleModifyCode = () => {
+    if (!modificationPrompt.trim() || !originalCode) return;
+    
+    setIsProcessing(true);
+    setTimeout(() => {
+      setModifiedCode(`// Modified code based on: "${modificationPrompt}"
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  status: 'active' | 'inactive';
+}
+
+const UserComponent: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get('/api/users');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setError('Failed to load users. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchUsers();
+  };
+
+  if (loading) {
+    return <div className="spinner">Loading users...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p className="error-message">{error}</p>
+        <button onClick={handleRefresh}>Retry</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="user-container">
+      <div className="header">
+        <h2>User Management</h2>
+        <button onClick={handleRefresh} className="refresh-btn">
+          <RefreshIcon /> Refresh
+        </button>
+      </div>
+      
+      <div className="user-grid">
+        {users.map(user => (
+          <div key={user.id} className="user-card">
+            <h3>{user.name}</h3>
+            <p className="email">{user.email}</p>
+            <span className={\`status \${user.status}\`}>
+              {user.status}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default UserComponent;`);
+      setIsProcessing(false);
+    }, 2000);
+  };
+
+  const handleLanguageConvert = () => {
+    if (!selectedLanguage || !originalCode) return;
+    
+    setIsProcessing(true);
+    setTimeout(() => {
+      let convertedCode = "";
+      
+      switch (selectedLanguage) {
+        case "Python":
+          convertedCode = `# Converted to Python
+import requests
+from typing import List, Dict, Optional
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    id: int
+    name: str
+    email: str
+    status: str = "active"
+
+class UserService:
+    def __init__(self):
+        self.users: List[User] = []
+        self.loading = False
+        self.error: Optional[str] = None
+    
+    async def fetch_users(self):
+        """Fetch users from API"""
+        try:
+            self.loading = True
+            self.error = None
+            
+            response = requests.get('/api/users')
+            response.raise_for_status()
+            
+            user_data = response.json()
+            self.users = [User(**user) for user in user_data]
+            
+        except requests.RequestException as e:
+            self.error = f"Failed to load users: {str(e)}"
+        finally:
+            self.loading = False
+    
+    def refresh(self):
+        """Refresh user data"""
+        return self.fetch_users()`;
+          break;
+          
+        case "Java":
+          convertedCode = `// Converted to Java
+import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+
+public class User {
+    private int id;
+    private String name;
+    private String email;
+    private String status;
+    
+    // Constructors, getters, setters
+    public User(int id, String name, String email, String status) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.status = status;
+    }
+    
+    // Getters and setters omitted for brevity
+}
+
+public class UserService {
+    private List<User> users = new ArrayList<>();
+    private boolean loading = false;
+    private String error = null;
+    
+    public CompletableFuture<Void> fetchUsers() {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                loading = true;
+                error = null;
+                
+                // HTTP client call would go here
+                // users = httpClient.get("/api/users");
+                
+            } catch (Exception e) {
+                error = "Failed to load users: " + e.getMessage();
+            } finally {
+                loading = false;
+            }
+        });
+    }
+    
+    public void refresh() {
+        fetchUsers();
+    }
+}`;
+          break;
+          
+        default:
+          convertedCode = "Language conversion not implemented for " + selectedLanguage;
+      }
+      
+      setModifiedCode(convertedCode);
+      setIsProcessing(false);
+    }, 1500);
+  };
+
+  return (
+    <div className="p-6 space-y-6 max-w-6xl">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-slate-900 mb-2">Code Assistant</h1>
+        <p className="text-slate-600">AI-powered code analysis, modification, and language conversion.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Code Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Code className="h-5 w-5" />
+            Code Selection
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Select Code Page</Label>
+              <Select value={selectedPage} onValueChange={setSelectedPage}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose page with code" />
+                </SelectTrigger>
+                <SelectContent>
+                  {codePages.map((page) => (
+                    <SelectItem key={page} value={page}>
+                      {page}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Button onClick={handleLoadCode} disabled={!selectedPage}>
+            Load Code
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Code Modification */}
+      {originalCode && (
         <Card>
           <CardHeader>
-            <CardTitle>Code Input</CardTitle>
-            <CardDescription>Paste your code for analysis and suggestions</CardDescription>
+            <CardTitle>Code Modification</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="javascript">JavaScript</SelectItem>
-                <SelectItem value="typescript">TypeScript</SelectItem>
-                <SelectItem value="python">Python</SelectItem>
-                <SelectItem value="java">Java</SelectItem>
-                <SelectItem value="csharp">C#</SelectItem>
-                <SelectItem value="go">Go</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Textarea
-              placeholder="Paste your code here..."
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="min-h-[400px] font-mono text-sm"
-            />
-            
-            <Button onClick={handleAnalyze} disabled={!code.trim() || isAnalyzing} className="w-full">
-              {isAnalyzing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing Code...
-                </>
-              ) : (
-                <>
-                  <Code className="mr-2 h-4 w-4" />
-                  Analyze Code
-                </>
-              )}
+            <div className="space-y-2">
+              <Label>Modification Instructions</Label>
+              <Textarea
+                placeholder="Describe what changes you want to make... e.g., 'Add error handling and loading states', 'Convert to use hooks', 'Add TypeScript types'"
+                value={modificationPrompt}
+                onChange={(e) => setModificationPrompt(e.target.value)}
+                className="min-h-[80px]"
+              />
+            </div>
+
+            <Button 
+              onClick={handleModifyCode}
+              disabled={!modificationPrompt.trim() || isProcessing}
+            >
+              {isProcessing ? "Modifying Code..." : "Apply Modifications"}
             </Button>
           </CardContent>
         </Card>
+      )}
 
+      {/* Language Converter */}
+      {originalCode && (
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Analysis Results</CardTitle>
-              <CardDescription>AI-powered suggestions and insights</CardDescription>
-            </div>
-            {analysis && (
-              <div className="flex gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Download className="mr-2 h-4 w-4" />
-                      Export
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>Export as PDF</DropdownMenuItem>
-                    <DropdownMenuItem>Export as TXT</DropdownMenuItem>
-                    <DropdownMenuItem>Export as HTML</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button size="sm">
-                  <Save className="mr-2 h-4 w-4" />
-                  Save to Confluence
-                </Button>
-              </div>
-            )}
+          <CardHeader>
+            <CardTitle>Language Converter</CardTitle>
           </CardHeader>
-          <CardContent>
-            {isAnalyzing ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                  <p className="text-muted-foreground">Analyzing your code...</p>
-                </div>
-              </div>
-            ) : analysis ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-muted/50 rounded-lg p-3">
-                    <div className="text-sm text-muted-foreground">Complexity</div>
-                    <div className="font-semibold">{analysis.complexity}</div>
-                  </div>
-                  <div className="bg-muted/50 rounded-lg p-3">
-                    <div className="text-sm text-muted-foreground">Maintainability</div>
-                    <div className="font-semibold">{analysis.maintainability}</div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4 text-yellow-500" />
-                    Suggestions
-                  </h4>
-                  <div className="space-y-3">
-                    {analysis.suggestions.map((suggestion: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          {suggestion.type === 'optimization' && <Code className="h-4 w-4 text-blue-500" />}
-                          {suggestion.type === 'best-practice' && <Lightbulb className="h-4 w-4 text-yellow-500" />}
-                          {suggestion.type === 'security' && <Bug className="h-4 w-4 text-red-500" />}
-                          <span className="text-sm font-medium capitalize">{suggestion.type}</span>
-                          <span className="text-xs text-muted-foreground">Line {suggestion.line}</span>
-                        </div>
-                        <p className="text-sm mb-2">{suggestion.message}</p>
-                        <pre className="bg-muted p-2 rounded text-xs overflow-x-auto">
-                          <code>{suggestion.code}</code>
-                        </pre>
-                      </div>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Convert to Language</Label>
+                <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose target language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languages.map((lang) => (
+                      <SelectItem key={lang} value={lang}>
+                        {lang}
+                      </SelectItem>
                     ))}
-                  </div>
-                </div>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-                <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <FileCode className="h-4 w-4 text-green-500" />
-                    Documentation
-                  </h4>
-                  <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-                    {analysis.documentation}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <Code className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Paste your code to get AI-powered analysis</p>
-              </div>
-            )}
+            <Button 
+              onClick={handleLanguageConvert}
+              disabled={!selectedLanguage || isProcessing}
+            >
+              {isProcessing ? "Converting..." : "Convert Language"}
+            </Button>
           </CardContent>
         </Card>
-      </div>
+      )}
+
+      {/* Code Viewer */}
+      {originalCode && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Original Code
+                <Button variant="outline" size="sm">
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto max-h-96 overflow-y-auto">
+                <pre className="text-sm font-mono">
+                  <code>{originalCode}</code>
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+
+          {modifiedCode && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  Modified Code
+                  <Button variant="outline" size="sm">
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto max-h-96 overflow-y-auto">
+                  <pre className="text-sm font-mono">
+                    <code>{modifiedCode}</code>
+                  </pre>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Export Options */}
+      {modifiedCode && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Export & Save</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Code
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Diff
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-3">
+                <Label>Save to Confluence</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Page title for modified code"
+                    className="flex-1"
+                  />
+                  <Button>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Code
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
