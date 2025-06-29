@@ -1,6 +1,6 @@
 
-import { AccordionEmbedPage } from "@/components/pages/AccordionEmbedPage";
+import { CompactDashboardPage } from "@/components/pages/CompactDashboardPage";
 
 export function Dashboard() {
-  return <AccordionEmbedPage />;
+  return <CompactDashboardPage />;
 }
