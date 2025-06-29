@@ -1,0 +1,9 @@
+streamlit
+openai
+python-dotenv
+fpdf
+moviepy
+faster-whisper
+atlassian-python-api
+google-generativeai
+ffmpeg-python
