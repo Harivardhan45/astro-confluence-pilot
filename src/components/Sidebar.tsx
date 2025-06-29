@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Search, Video, Code, BarChart, TestTube, LayoutDashboard } from "lucide-react";
+import { Search, Video, Code, BarChart, TestTube } from "lucide-react";
 import { 
   Tooltip,
   TooltipContent,
@@ -16,61 +16,55 @@ interface SidebarProps {
 
 const navigation = [
   {
-    name: "Dashboard",
-    id: "dashboard",
-    icon: LayoutDashboard,
-    description: "Overview and analytics"
-  },
-  {
-    name: "AI Search",
+    name: "AI Powered Search",
     id: "search",
     icon: Search,
-    description: "Search across Confluence spaces"
+    description: "Search across Confluence spaces with AI assistance"
   },
   {
     name: "Video Summarizer",
     id: "video",
     icon: Video,
-    description: "Generate video summaries"
+    description: "Generate summaries from video content"
   },
   {
     name: "Code Assistant",
     id: "code",
     icon: Code,
-    description: "Code analysis and suggestions"
+    description: "AI-powered code analysis and modifications"
   },
   {
     name: "Impact Analyzer",
     id: "diff",
     icon: BarChart,
-    description: "Analyze change impact"
+    description: "Analyze changes and their impact"
   },
   {
-    name: "Test Support",
+    name: "Test Support Tool",
     id: "testing",
     icon: TestTube,
-    description: "Generate test suites"
+    description: "Generate comprehensive test strategies"
   },
 ];
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   return (
     <TooltipProvider>
-      <div className="flex h-full w-64 flex-col bg-slate-50 border-r border-slate-200">
+      <div className="flex h-full w-72 flex-col bg-white border-r border-slate-200">
         {/* Header */}
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-slate-200">
-          <div className="h-10 w-10 rounded-lg bg-blue-600 flex items-center justify-center">
-            <span className="text-white font-bold text-lg">C</span>
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="h-10 w-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-sm">
+            <span className="text-white font-bold text-lg">AI</span>
           </div>
           <div>
-            <h2 className="font-semibold text-slate-900">Confluence AI</h2>
-            <p className="text-xs text-slate-500">Assistant</p>
+            <h2 className="font-semibold text-slate-900 text-lg">Confluence AI</h2>
+            <p className="text-sm text-slate-600">Assistant</p>
           </div>
         </div>
         
         {/* Navigation */}
-        <nav className="flex-1 p-3">
-          <div className="space-y-1">
+        <nav className="flex-1 p-4">
+          <div className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = activeView === item.id;
@@ -81,18 +75,36 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "w-full justify-start gap-3 h-11 px-3 text-slate-700 hover:bg-blue-50 hover:text-blue-900",
-                        isActive && "bg-blue-100 text-blue-900 shadow-sm font-medium"
+                        "w-full justify-start gap-4 h-auto p-4 text-left hover:bg-blue-50 hover:border-blue-200 border border-transparent rounded-lg transition-all duration-200",
+                        isActive && "bg-blue-100 border-blue-200 text-blue-900 shadow-sm"
                       )}
                       onClick={() => onViewChange(item.id)}
                     >
-                      <Icon className="h-5 w-5" />
-                      <span className="text-sm">{item.name}</span>
+                      <div className={cn(
+                        "flex h-8 w-8 items-center justify-center rounded-md",
+                        isActive ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"
+                      )}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={cn(
+                          "font-medium text-sm truncate",
+                          isActive ? "text-blue-900" : "text-slate-900"
+                        )}>
+                          {item.name}
+                        </div>
+                        <div className={cn(
+                          "text-xs mt-1 line-clamp-2 leading-4",
+                          isActive ? "text-blue-700" : "text-slate-500"
+                        )}>
+                          {item.description}
+                        </div>
+                      </div>
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-slate-900 text-white">
+                  <TooltipContent side="right" className="max-w-xs">
                     <p className="font-medium">{item.name}</p>
-                    <p className="text-xs text-slate-300">{item.description}</p>
+                    <p className="text-xs text-slate-300 mt-1">{item.description}</p>
                   </TooltipContent>
                 </Tooltip>
               );
@@ -102,14 +114,11 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         
         {/* Footer */}
         <div className="p-4 border-t border-slate-200">
-          <div className="rounded-lg bg-blue-50 p-4 border border-blue-200">
-            <h4 className="text-sm font-medium text-blue-900 mb-1">Need Help?</h4>
-            <p className="text-xs text-blue-700 mb-3">
-              Check our documentation for guides and tutorials.
+          <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+            <h4 className="text-sm font-semibold text-slate-900 mb-2">Quick Help</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Select any feature above to start using AI assistance for your Confluence workflows.
             </p>
-            <Button size="sm" variant="outline" className="w-full text-blue-700 border-blue-300 hover:bg-blue-100">
-              View Docs
-            </Button>
           </div>
         </div>
       </div>
